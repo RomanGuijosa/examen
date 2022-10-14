@@ -18,18 +18,16 @@ public class separar {
     
 
     String[][] conversiones = {
-        {"ch", "@"}, {"ll", "#"}, {"gue", "%e"}, {"gué", "%é"}, {"gui", "%i"}, {"guí", "%í"},
+        {"ch", "@"}, {"ll", "#"}, {"gue", "%e"}, {"gui", "%i"},
         {"qu", "&"}, {"rr", "$"}, {"ya", "|a"}, {"ye", "|e"}, {"yi", "|i"}, {"yo", "|o"}, {"yu", "|u"}
     };
-    char[] abiertas = {'a', 'á', 'e', 'é', 'o', 'ó'};
-    char[] cerradas = {'i', 'u', 'ü', 'y'};
-    char[] cerradas_tilde = {'í', 'ú'};
-    public Pattern patron_tilde = Pattern.compile(".*(á|é|í|ó|ú).*");
-    Pattern patron_vocal_n_s = Pattern.compile(".*(á|é|í|ó|ú|a|e|i|o|u|n|s)");
+    char[] abiertas = {'a', 'e', 'o'};
+    char[] cerradas = {'i', 'u', 'y'};
+    Pattern patron_vocal_n_s = Pattern.compile(".*(a|e|i|o|u|n|s)");
     char enye = 'ñ';
 
     public char[] getVocales() {
-        int size = abiertas.length + cerradas.length + cerradas_tilde.length;
+        int size = abiertas.length + cerradas.length;
         char[] vocales = new char[size];
         int i = 0;
         for (int j = 0; j < abiertas.length; j++) {
@@ -40,10 +38,7 @@ public class separar {
             vocales[i] = cerradas[j];
             i++;
         }
-        for (int j = 0; j < cerradas_tilde.length; j++) {
-            vocales[i] = cerradas_tilde[j];
-            i++;
-        }
+        
         return vocales;
     }
 
@@ -96,8 +91,7 @@ public class separar {
             }
         }
 
-        // sabemos que todas las letras anteriores a vocal + vocal forman parte de la sílaba, veamos las siguientes
-        // vocal es la última vocal de la palabra: no hay más sílabas
+        
         if (ultimaVocal(vocal, a)) {
             return w.length() - 1;
         }
@@ -108,7 +102,7 @@ public class separar {
             hacheIntercalada = 1;
         }
 
-        // l1 es la última letra
+       
         if (l1 + 1 == a.length) {
             if (esVocal(a[l1]) && isHiato(a[vocal], a[l1])) {
                 return vocal;
@@ -122,10 +116,10 @@ public class separar {
             l2++;
             hacheIntercalada = 1;
         }
-        if (esConsonante(a[l1]) && esVocal(a[l2])) // VCV
+        if (esConsonante(a[l1]) && esVocal(a[l2])) 
         {
             return vocal;
-        } else if (esConsonante(a[l1]) && esConsonante(a[l2])) // VCC
+        } else if (esConsonante(a[l1]) && esConsonante(a[l2])) 
         {
             String[] cc = {"tr", "gr", "pr", "br", "bl", "fr", "fl", "cl", "dr", "pl"};
             char[] tokenchar = {a[l1], a[l2]};
@@ -141,7 +135,7 @@ public class separar {
                 }
             }
             return l1 + hacheIntercalada; 
-        } else if (esVocal(a[l1])) // VV?
+        } else if (esVocal(a[l1])) 
         {
             if (isHiato(a[vocal], a[l1])) {
                 return vocal + hacheIntercalada;
@@ -163,11 +157,6 @@ public class separar {
 
     public boolean isHiato(char v1, char v2) {
         
-        for (char c : cerradas_tilde) {
-            if (c == v1 || c == v2) {
-                return true;
-            }
-        }
         
         for (char c1 : abiertas) {
             if (c1 == v1) {
@@ -178,7 +167,7 @@ public class separar {
                 }
             }
         }
-        // si son iguales (aa, ii)
+        
         return (v1 == v2);
     }
 
@@ -229,11 +218,6 @@ public class separar {
 
         int ret = -1;
        
-        for (int i = 0; i < silabas.size(); i++) {
-            if (patron_tilde.matcher(silabas.get(i)).matches()) {
-                return i;
-            }
-        }
 
         if (ret != -1) {
             return ret;
@@ -251,11 +235,10 @@ public class separar {
     public int vocalTonica(String silaba) {
         char[] letras = silaba.toLowerCase().toCharArray();
         int ret = -1, j = 0;
-        Pattern patron_vocales_todas = Pattern.compile("a|e|i|o|u|á|é|í|ó|ú");
-        Pattern patron_vocales_acentuadas = Pattern.compile("á|é|í|ó|ú");
-        Pattern patron_vocales_abiertas = Pattern.compile("a|á|e|é|o|ó");
+        Pattern patron_vocales_todas = Pattern.compile("a|e|i|o|u");
+        Pattern patron_vocales_abiertas = Pattern.compile("a|e|o");
 
-        // si hay sólo una vocal, es ésa: mas
+        
         for (int i = 0; i < letras.length; i++) {
             StringBuffer sb = new StringBuffer();
             sb.append(letras[i]);
@@ -273,9 +256,7 @@ public class separar {
         for (int i = 0; i < letras.length; i++) {
             StringBuffer sb = new StringBuffer();
             sb.append(letras[i]);
-            if (patron_vocales_acentuadas.matcher(sb).matches()) {
-                ret = i;
-            }
+            
         }
         if (ret != -1) {
             return ret;
